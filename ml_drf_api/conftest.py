@@ -16,7 +16,13 @@ def user(db) -> User:
 
 
 @pytest.fixture
-def user_client(user):
+def auth_user_client(user):
     client = test.Client()
     client.force_login(user)
+    return client
+
+
+@pytest.fixture
+def unauth_user_client(user):
+    client = test.Client()
     return client
