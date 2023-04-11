@@ -1,5 +1,11 @@
+import pytest
 from django.http.response import HttpResponseForbidden
 from django.urls import reverse
+
+from .models import ModelLog
+from .tasks import log_model_output
+
+pytestmark = [pytest.mark.django_db(transaction=True)]
 
 data = {
     "input": [
@@ -49,3 +55,18 @@ class TestCoreView:
         response = unauth_user_client.post(url, data)
         assert isinstance(response, HttpResponseForbidden)
         assert response.status_code == 403
+
+
+class TestCoreTask:
+    def test_log_model_output(self):
+        log_model_output.delay(input=data["input"], output="1")
+        logs = ModelLog.objects.all()
+        assert len(logs) == 1
+
+    def test_log_integration(self, auth_user_client):
+        url = reverse("infer")
+        response = auth_user_client.post(url, data)
+        logs = ModelLog.objects.all()
+
+        assert response.status_code == 200, response.json()
+        assert len(logs) == 1
