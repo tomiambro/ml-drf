@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 volumes:
   ml_drf_api_local_postgres_data: {}
@@ -32,6 +32,7 @@ services:
     volumes:
       - ml_drf_api_local_postgres_data:/var/lib/postgresql/data
       - ml_drf_api_local_postgres_data_backups:/backups
+    ports: ['5432:5432']
     env_file:
       - ./.envs/.local/.postgres
 
