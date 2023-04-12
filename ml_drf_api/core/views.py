@@ -16,12 +16,16 @@ def infer(request):
     else:
         estimator = joblib.load(model_path)
         input = request.POST.getlist("input")
-        try:
-            prediction = estimator.predict([input])[0]
-            log_model_output.delay(input=str(input), output=str(prediction))
-        except ValueError as e:
-            log_model_output.delay(input=str(input), output=str(prediction), error=e)
-            raise e
-
-        payload = {"message": f"This is the model's prediction: {prediction}"}
+        if input:
+            try:
+                prediction = estimator.predict([input])[0]
+                # log the output to the db using a celery task
+                log_model_output.delay(input=str(input), output=str(prediction))
+                payload = {"message": f"This is the model's prediction: {prediction}"}
+            except ValueError as e:
+                payload = {"message": f"{e}"}
+                log_model_output.delay(input=str(input), error=e)
+                raise e
+        else:
+            payload = {"message": "No input provided"}
         return JsonResponse(payload)
