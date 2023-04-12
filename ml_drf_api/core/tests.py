@@ -50,6 +50,13 @@ class TestCoreView:
         assert response.json()["message"] == "This is the model's prediction: 1"
         assert response.status_code == 200
 
+    def test_infer_view_auth_no_input(self, auth_user_client):
+        url = reverse("infer")
+        data = {}
+        response = auth_user_client.post(url, data)
+        assert response.json()["message"] == "No input provided"
+        assert response.status_code == 200
+
     def test_infer_view_unauth(self, unauth_user_client):
         url = reverse("infer")
         response = unauth_user_client.post(url, data)
