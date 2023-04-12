@@ -30,3 +30,6 @@ EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 TEMPLATES[0]["OPTIONS"]["debug"] = True  # type: ignore # noqa: F405
 # Your stuff...
 # ------------------------------------------------------------------------------
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_TASK_STORE_EAGER_RESULT = True
