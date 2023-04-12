@@ -6,3 +6,6 @@ class ModelLog(TimeStampedModel):
     input = models.CharField(max_length=300, null=False)
     output = models.CharField(max_length=100, null=True)
     error_log = models.CharField(max_length=200, null=True)
+
+    def __str__(self) -> str:
+        return f"Model log #{self.id}"
