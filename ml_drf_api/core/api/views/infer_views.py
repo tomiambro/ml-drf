@@ -14,6 +14,7 @@ model_path = Path(settings.APPS_DIR / "ml/saved_models/randomforest_breast_cance
 
 class InferView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    serializer_class = InferSerializer
 
     def post(self, request):
         serializer = InferSerializer(data=request.data)
