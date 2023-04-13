@@ -1,5 +1,4 @@
 import pytest
-from django.http.response import HttpResponseForbidden
 from django.urls import reverse
 
 from .models import ModelLog
@@ -60,7 +59,6 @@ class TestCoreView:
     def test_infer_view_unauth(self, unauth_user_client):
         url = reverse("infer")
         response = unauth_user_client.post(url, data)
-        assert isinstance(response, HttpResponseForbidden)
         assert response.status_code == 403
 
 

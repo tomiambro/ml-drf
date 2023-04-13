@@ -1,7 +1,7 @@
 from django.urls import path
 
-from . import views
+from .api.views import InferView
 
 urlpatterns = [
-    path("infer", views.infer, name="infer"),
+    path("infer", InferView.as_view(), name="infer"),
 ]
