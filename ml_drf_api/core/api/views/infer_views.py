@@ -36,9 +36,9 @@ class InferView(APIView):
                         "message": f"This is the model's prediction: {prediction}"
                     }
                 except Exception as e:
+                    payload = {"message": f"{e}"}
+                    log_model_output.delay(input=str(input), error=str(e))
                     logging.warn(f"The following exception occured: {e}")
-                    log_model_output.delay(input=str(input), error=e)
-                    raise e
         except ValidationError as e:
             log_model_output.delay(input="", error=e.detail)
             logging.warn(f"Wrong input provided: {e}")

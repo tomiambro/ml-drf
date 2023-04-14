@@ -62,8 +62,6 @@ class TestCoreView:
         response = unauth_user_client.post(url, data)
         assert response.status_code == 403
 
-
-class TestCoreTask:
     def test_log_model_output(self):
         log_model_output.delay(input=data["input"], output="1")
         logs = ModelLog.objects.all()
@@ -81,7 +79,7 @@ class TestCoreTask:
         assert response.status_code == 200, response.json()
         assert len(logs) == 1
 
-    def test_log_integration_no_input(self, auth_user_client):
+    def test_log_integration_validation_error(self, auth_user_client):
         url = reverse("infer")
         data = {"input": []}
         response = auth_user_client.post(url, data)
@@ -91,3 +89,16 @@ class TestCoreTask:
         assert response.status_code == 400, response.json()
         assert len(logs) == 1
         assert log.error_log == "{'input': ['This field is required.']}"
+
+    def test_log_integration_value_error(self, auth_user_client):
+        url = reverse("infer")
+        data = {"input": [0]}
+        response = auth_user_client.post(url, data)
+        logs = ModelLog.objects.all()
+        log = logs.first()
+
+        assert response.status_code == 200, response.json()
+        assert len(logs) == 1
+        assert (
+            "RandomForestClassifier is expecting 30 features as input." in log.error_log
+        )
