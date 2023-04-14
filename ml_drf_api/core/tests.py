@@ -1,4 +1,5 @@
 import pytest
+from celery import states
 from django.urls import reverse
 
 from .models import ModelLog
@@ -53,8 +54,8 @@ class TestCoreView:
         url = reverse("infer")
         data = {}
         response = auth_user_client.post(url, data)
-        assert response.json()["message"] == "No input provided"
-        assert response.status_code == 200
+        assert response.json() == {"input": ["This field is required."]}
+        assert response.status_code == 400
 
     def test_infer_view_unauth(self, unauth_user_client):
         url = reverse("infer")
@@ -68,6 +69,10 @@ class TestCoreTask:
         logs = ModelLog.objects.all()
         assert len(logs) == 1
 
+        log = logs.first()
+        assert log.status == states.SUCCESS
+        assert log.error_log == ""
+
     def test_log_integration(self, auth_user_client):
         url = reverse("infer")
         response = auth_user_client.post(url, data)
@@ -75,3 +80,14 @@ class TestCoreTask:
 
         assert response.status_code == 200, response.json()
         assert len(logs) == 1
+
+    def test_log_integration_no_input(self, auth_user_client):
+        url = reverse("infer")
+        data = {"input": []}
+        response = auth_user_client.post(url, data)
+        logs = ModelLog.objects.all()
+        log = logs.first()
+
+        assert response.status_code == 400, response.json()
+        assert len(logs) == 1
+        assert log.error_log == "{'input': ['This field is required.']}"
