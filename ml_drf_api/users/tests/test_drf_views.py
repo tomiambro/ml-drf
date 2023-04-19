@@ -41,7 +41,7 @@ class TestUserViewSet:
         UserFactory()
         url = reverse("api:user-list")
         response = auth_user_client.get(url)
-        breakpoint()
+
         assert response.status_code == 200, response.json()
         assert len(response.json()) == 1
 
