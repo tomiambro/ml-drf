@@ -23,6 +23,14 @@ services:
       - "8000:8000"
     command: /start
 
+  locust:
+    image: locustio/locust
+    command: -f /mnt/locust/locustfile.py --host=http://django:8000
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./locust:/mnt/locust
+
   postgres:
     build:
       context: .
